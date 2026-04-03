@@ -7,6 +7,7 @@ This hook checks for security patterns in file edits and warns about potential v
 import json
 import os
 import random
+import re
 import sys
 from datetime import datetime
 
@@ -128,7 +129,9 @@ Only use exec() if you absolutely need shell features and the input is guarantee
 
 def get_state_file(session_id):
     """Get session-specific state file path."""
-    return os.path.expanduser(f"~/.claude/security_warnings_state_{session_id}.json")
+    # Sanitize session_id to prevent path traversal via attacker-controlled input
+    safe_id = re.sub(r'[^a-zA-Z0-9_-]', '_', session_id)
+    return os.path.expanduser(f"~/.claude/security_warnings_state_{safe_id}.json")
 
 
 def cleanup_old_state_files():
